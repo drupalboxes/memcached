@@ -1,4 +1,3 @@
-
 class memcached::install {
   package { 'memcached':
     ensure   => $memcached::params::version,
@@ -33,6 +32,12 @@ class memcached::config {
 }
 
 class memcached {
-  include memcached::params
-  include memcached::install, memcached::config, memcached::service
+  anchor {'memcached::begin': } ->
+  class { 'memcached::params': } ->
+  class { 'memcached::install': } ->
+  class { 'memcached::config': } ->
+  class { 'memcached::service': } ->
+  anchor {'memcached::end':
+    require => Anchor['memcached::begin']
+  }
 }
